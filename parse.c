@@ -43,7 +43,6 @@ int main(int argc, char** argv) {
   FILE* fin; //ptr for infile
   FILE* fout; //ptr for outfile
   struct Elf64_Ehdr header; //first 64B of elf file
-  long addr=0; //counter for fout
 
   // Open file
   printf("Opening file, %s\n", ELF_FILE);
@@ -76,19 +75,17 @@ int main(int argc, char** argv) {
   }
 
   // iter over .text bytes for OPcodes
-  fprintf(fout, "ADDR  OP Operands\n--------------------\n");
-  addr=SH_TEXT.sh_offset;
+  fprintf(fout, "Wget elf binary\nADDR  OP Operands\n--------------------\n");
   printf("Finding %02X opcodes\n", CALL_E8);
   for(long i=0; i<SH_TEXT.sh_size-4; i++) {
     if (buff[i]==CALL_E8) {
       fprintf(
         fout, 
-        "%lx: %02X %02X %02X %02X %02X\n", 
-        addr, buff[i], buff[i+1], buff[i+2], buff[i+3], buff[i+4]
+        "%llx: %02X %02X %02X %02X %02X\n", 
+        SH_TEXT.sh_offset+i, buff[i], buff[i+1], buff[i+2], buff[i+3], buff[i+4]
       );
-      i+=4; addr+=4;
+      i+=4;
     }
-    addr++;
   }
   fclose(fout);
 
